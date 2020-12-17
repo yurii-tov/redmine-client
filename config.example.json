@@ -1,0 +1,5 @@
+{
+    "url": "http://my-redmine-server",
+    "login": "my-login",
+    "password": "secret"
+}
