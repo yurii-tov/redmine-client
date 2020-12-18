@@ -1,4 +1,3 @@
-var page = require('webpage').create();
 var system = require('system');
 var fs = require('fs');
 
@@ -26,7 +25,19 @@ function show_help() {
 
 var commands = {
     'show': function() {console.log(page.plainText)},
-    'close': function() {console.log('close: TBA')}
+    'close': function() {
+        console.log('close: TBA');
+        page.evaluate(function() {
+            document.querySelector('a[href*=edit]').click();
+            setTimeout(function() {
+                var status_select = document.querySelector('select#issue_status_id');
+                var opts = [].slice.call(status_select.options).map(function(x) {return x.textContent});
+                var i = opts.indexOf('Code review');
+                status_select.setValue(i);
+            }, 500);
+        });
+        page.render('s.png');
+    }
 };
 
 
@@ -38,6 +49,10 @@ function process_ticket(command) {
     }
     c();
 }
+
+
+var page = require('webpage').create();
+page.onConsoleMessage = function(m) {console.log(m)};
 
 
 page.open(
