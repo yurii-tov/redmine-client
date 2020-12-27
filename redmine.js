@@ -9,8 +9,8 @@ if (system.args.length < 3) {
 }
 
 
-var ticket = system.args[1];
-var command_name = system.args[2];
+var command_name = system.args[1];
+var ticket = system.args[2];
 
 
 var config = JSON.parse(fs.read("config.json"));
@@ -21,8 +21,8 @@ var password = config['password'];
 
 function show_help() {
     console.log('Usage:');
-    console.log('phantomjs redmine.js <ticket> show');
-    console.log('phantomjs redmine.js <ticket> edit [updates]');
+    console.log('phantomjs redmine.js show <ticket>');
+    console.log('phantomjs redmine.js edit <ticket> [updates]');
     console.log('    where [updates] is a json:');
     console.log('    {"status": "new status",');
     console.log('     "comment": "some comment"}');

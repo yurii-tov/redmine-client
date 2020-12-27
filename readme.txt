@@ -16,5 +16,5 @@
      
 
 ** Usage
-   $ ./redmine 42 show
-   $ ./redmine 42 edit '{"status": "Closed", "comment": "Close damn ticket already"}'
+   $ ./redmine show 42
+   $ ./redmine edit 42 '{"status": "Closed", "comment": "Close damn ticket already"}'
