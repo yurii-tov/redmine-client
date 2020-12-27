@@ -20,7 +20,12 @@ var password = config['password'];
 
 
 function show_help() {
-    console.log('Usage: phantomjs redmine.js <ticket> <show|edit>');
+    console.log('Usage:');
+    console.log('phantomjs redmine.js <ticket> show');
+    console.log('phantomjs redmine.js <ticket> edit [updates]');
+    console.log('    where [updates] is a json:');
+    console.log('    {"status": "new status",');
+    console.log('     "comment": "some comment"}');
 }
 
 
@@ -31,8 +36,13 @@ var commands = {
     },
     'edit': {
         path: "/issues/edit/",
-        action: function(status) {
-            page.evaluate(function(status) {
+        onLoadFinished: function(status) {
+            setTimeout(function() {
+                phantom.exit();
+            }, 1500);
+        },
+        action: function(update) {
+            page.evaluate(function(update) {
                 var select = function(selector, option) {
                     var s = document.querySelector(selector);
                     var opts = {};
@@ -42,10 +52,25 @@ var commands = {
                     s.value = opts[option];
                     return s.value;
                 };
-                var result = select('select#issue_status_id', status);
-                console.log('status now: ' + result);
-            }, status);
-            page.render('s.png');
+                var type = function(selector, text) {
+                    var i = document.querySelector(selector);
+                    i.value = text;
+                    return i.value;
+                };
+                var edit = function(update) {
+                    var edits = {
+                        status: function(s) {select('select#issue_status_id', s)},
+                        comment: function(c) {type('textarea#notes', c)}
+                    };
+                    for (k in update) {
+                        var v = update[k];
+                        var e = edits[k];
+                        e(v);
+                    }
+                    document.querySelector('#issue-form input[name=commit]').click();
+                };
+                update && edit(JSON.parse(update));
+            }, update);
         }
     }
 }
@@ -72,11 +97,12 @@ page.open(
     function() {
         var c = get_command(command_name);
         var url = REDMINE_URL + c.path + ticket;
+        page.onLoadFinished = c.onLoadFinished;
         page.open(
             url,
             function() {
                 c.action(system.args[3]);
-                phantom.exit();
+                c.onLoadFinished || phantom.exit();
             }
         );
     }
