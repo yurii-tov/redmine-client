@@ -1,5 +1,6 @@
 var system = require('system');
 var fs = require('fs');
+var webpage = require('webpage');
 
 
 if (system.args.length < 3) {
@@ -9,7 +10,7 @@ if (system.args.length < 3) {
 
 
 var ticket = system.args[1];
-var command = system.args[2];
+var command_name = system.args[2];
 
 
 var config = JSON.parse(fs.read("config.json"));
@@ -19,39 +20,48 @@ var password = config['password'];
 
 
 function show_help() {
-    console.log('Usage: phantomjs redmine.js <ticket> <show|close>');
+    console.log('Usage: phantomjs redmine.js <ticket> <show|edit>');
 }
 
 
 var commands = {
-    'show': function() {console.log(page.plainText)},
-    'close': function() {
-        console.log('close: TBA');
-        page.evaluate(function() {
-            document.querySelector('a[href*=edit]').click();
-            setTimeout(function() {
-                var status_select = document.querySelector('select#issue_status_id');
-                var opts = [].slice.call(status_select.options).map(function(x) {return x.textContent});
-                var i = opts.indexOf('Code review');
-                status_select.setValue(i);
-            }, 500);
-        });
-        page.render('s.png');
+    'show': {
+        path: "/issues/show/",
+        action: function() {console.log(page.plainText)}
+    },
+    'edit': {
+        path: "/issues/edit/",
+        action: function(status) {
+            page.evaluate(function(status) {
+                var select = function(selector, option) {
+                    var s = document.querySelector(selector);
+                    var opts = {};
+                    [].slice.call(s.options).map(function(o) {
+                        opts[o.textContent] = o.value;
+                    });
+                    s.value = opts[option];
+                    return s.value;
+                };
+                var result = select('select#issue_status_id', status);
+                console.log('status now: ' + result);
+            }, status);
+            page.render('s.png');
+        }
     }
-};
+}
 
 
-function process_ticket(command) {
-    var c = commands[command];
+function get_command(name) {
+    var c = commands[name];
     if (!c) {
         show_help();
         phantom.exit(1);
     }
-    c();
+    return c;
 }
 
 
-var page = require('webpage').create();
+var page = webpage.create();
 page.onConsoleMessage = function(m) {console.log(m)};
 
 
@@ -60,10 +70,12 @@ page.open(
     'POST',
     'username=' + login + '&password=' + password,
     function() {
+        var c = get_command(command_name);
+        var url = REDMINE_URL + c.path + ticket;
         page.open(
-            REDMINE_URL + '/issues/show/' + ticket,
+            url,
             function() {
-                process_ticket(command);
+                c.action(system.args[3]);
                 phantom.exit();
             }
         );
