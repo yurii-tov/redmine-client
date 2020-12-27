@@ -1,3 +1,4 @@
+
 cd $(readlink -f $(dirname $0))
 
-phantomjs redmine.js $*
+phantomjs redmine.js "$@"
