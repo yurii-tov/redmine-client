@@ -21,8 +21,8 @@ var password = config['password'];
 
 function show_help() {
     console.log('Usage:');
-    console.log('phantomjs redmine.js show <ticket>');
-    console.log('phantomjs redmine.js edit <ticket> [updates]');
+    console.log('redmine show <ticket>');
+    console.log('redmines edit <ticket> [updates]');
     console.log('    where [updates] is a json:');
     console.log('    {"status": "new status",');
     console.log('     "comment": "some comment"}');
