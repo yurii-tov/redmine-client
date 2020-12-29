@@ -32,7 +32,10 @@ function show_help() {
 var commands = {
     'show': {
         path: "/issues/show/",
-        action: function() {console.log(page.plainText)}
+        action: function() {
+            var text = page.plainText;
+            console.log(text.substring(text.match(/.*#\d+/).index));
+        }
     },
     'edit': {
         path: "/issues/edit/",
