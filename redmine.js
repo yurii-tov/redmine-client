@@ -25,6 +25,7 @@ function show_help() {
     console.log('redmines edit <ticket> [updates]');
     console.log('    where [updates] is a json:');
     console.log('    {"status": "new status",');
+    console.log('     "assigned": "Vasya",');
     console.log('     "comment": "some comment"}');
 }
 
@@ -63,7 +64,8 @@ var commands = {
                 var edit = function(update) {
                     var edits = {
                         status: function(s) {select('select#issue_status_id', s)},
-                        comment: function(c) {type('textarea#notes', c)}
+                        comment: function(c) {type('textarea#notes', c)},
+                        assigned: function(c) {select('select#issue_assigned_to_id', c)}
                     };
                     for (k in update) {
                         var v = update[k];
