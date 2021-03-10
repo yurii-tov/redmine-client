@@ -22,7 +22,7 @@ var password = config['password'];
 function show_help() {
     console.log('Usage:');
     console.log('redmine show <ticket>');
-    console.log('redmines edit <ticket> [updates]');
+    console.log('redmine edit <ticket> [updates]');
     console.log('    where [updates] is a json:');
     console.log('    {"status": "new status",');
     console.log('     "assigned": "Vasya",');
